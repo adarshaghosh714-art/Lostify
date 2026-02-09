@@ -1,44 +1,33 @@
 package com.example.lostify.data
 
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
+
+class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
 
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.ViewModel
-import com.example.lostify.R
-import com.example.lostify.data.ItemType
-import com.example.lostify.data.LostItem
-
-class HomeViewModel : ViewModel() {
-
-
-    private val _items = mutableStateOf<List<LostItem>>(emptyList())
-
-
-    val items: State<List<LostItem>> = _items
+    private val repository: LostItemRepository
 
     init {
-        loadDummyItems()
+        val dao = LostifyDatabase
+            .getDatabase(application)
+            .lostItemDao()
+
+        repository = LostItemRepository(dao)
     }
 
-    private fun loadDummyItems() {
-        _items.value = listOf(
-            LostItem(
-                id = "1",
-                title = "EarBuds",
-                location = "College Canteen",
-                date = "24 Jan 2026",
-                imageRes = R.drawable.ic_lost1,
-                type = ItemType.FOUND
-            ),
-            LostItem(
-                id = "2",
-                title = "iPhone 13",
-                location = "Library",
-                date = "23 Jan 2026",
-                imageRes = R.drawable.ic_lost1,
-                type = ItemType.LOST
-            )
+
+    val items = repository.getAllItems()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
         )
-    }
+
+
+    fun getItemById(itemId: Int) =
+        repository.getItemById(itemId)
 }

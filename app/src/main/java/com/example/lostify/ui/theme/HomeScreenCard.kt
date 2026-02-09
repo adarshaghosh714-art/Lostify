@@ -17,17 +17,20 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.lostify.R
-import com.example.lostify.data.ItemType
-import com.example.lostify.data.LostItem
+import com.example.lostify.data.LostItemEntity
 
 @Composable
 fun LostItemCard(
-    item: LostItem,
+    item: LostItemEntity,
     onClick: () -> Unit
 ) {
+
+    val imageResId = item.imageRes ?: 0
+    val safeImageRes =
+        if (imageResId != 0) imageResId else R.drawable.ic_lost1
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -36,14 +39,15 @@ fun LostItemCard(
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
+
         Row(
             modifier = Modifier.padding(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
 
             Image(
-                painter = painterResource(id = item.imageRes),
-                contentDescription = item.title,
+                painter = painterResource(id = safeImageRes),
+                contentDescription = item.title ?: "Lost item",
                 modifier = Modifier
                     .size(72.dp)
                     .clip(RoundedCornerShape(12.dp)),
@@ -52,22 +56,26 @@ fun LostItemCard(
 
             Spacer(modifier = Modifier.width(12.dp))
 
-            Column {
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
+
                 Text(
-                    text = item.title,
+                    text = item.title ?: "Untitled Item",
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
-                    fontStyle = FontStyle.Italic
+                    fontWeight = FontWeight.SemiBold
                 )
 
                 Spacer(modifier = Modifier.height(4.dp))
 
                 Text(
-                    text = "📍 ${item.location}",
+                    text = "📍 ${item.location ?: "Unknown location"}",
                     style = MaterialTheme.typography.bodyMedium,
                     fontStyle = FontStyle.Italic,
                     color = Color.Blue
                 )
+
+                Spacer(modifier = Modifier.height(2.dp))
 
                 Text(
                     text = "🕒 ${item.date}",
