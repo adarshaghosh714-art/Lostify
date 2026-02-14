@@ -23,6 +23,7 @@ data class LostItemEntity(
 
     val imageRes: Int? = null,
 
+    val imageUri: String?,
 
     val contactNumber: String? = null,
     val email: String? = null

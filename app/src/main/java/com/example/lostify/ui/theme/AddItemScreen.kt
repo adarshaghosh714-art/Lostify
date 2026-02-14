@@ -1,6 +1,12 @@
 package com.example.lostify.ui.theme
 
+import android.app.Application
+import android.content.Intent
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -12,19 +18,25 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavHostController
+import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import coil.compose.AsyncImage
 import com.example.lostify.data.ItemType
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddItemScreen(
-    navController: NavHostController,
-    viewModel: AddItemViewModel = viewModel()
+    navController: NavController,
+    viewModel: AddItemViewModel
 ) {
+
+    val context = LocalContext.current
+
+    var imageUri by remember { mutableStateOf<Uri?>(null) }
     var itemType by remember { mutableStateOf(ItemType.LOST) }
     var title by remember { mutableStateOf("") }
     var location by remember { mutableStateOf("") }
@@ -32,16 +44,25 @@ fun AddItemScreen(
     var contactNumber by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
 
+    val imagePickerLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.GetContent()
+        ) { uri ->
+            uri?.let {
+                context.contentResolver.takePersistableUriPermission(
+                    it,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION
+                )
+                imageUri = it
+            }
+        }
+
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("Add Item") },
                 navigationIcon = {
-                    IconButton(
-                        onClick = {
-                            navController.popBackStack()
-                        }
-                    ) {
+                    IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
                             contentDescription = "Back"
@@ -61,7 +82,12 @@ fun AddItemScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
 
-            ImageUploadCard()
+            ImageUploadCard(
+                imageUri = imageUri,
+                onImageClick = {
+                    imagePickerLauncher.launch("image/*")
+                }
+            )
 
             LostFoundToggle(
                 selectedType = itemType,
@@ -81,31 +107,35 @@ fun AddItemScreen(
                 onEmailChange = { email = it }
             )
 
-
             Spacer(modifier = Modifier.height(8.dp))
 
             PostButton {
-                viewModel.addItem(
-                    type = itemType,
-                    title = title,
-                    location = location,
-                    description = description,
-                    contactNumber = contactNumber,
-                    email = email
-                )
 
+                if (title.isNotBlank() && location.isNotBlank()) {
 
+                    viewModel.addItem(
+                        type = itemType,
+                        title = title.trim(),
+                        location = location.trim(),
+                        description = description.trim(),
+                        contactNumber = contactNumber.trim(),
+                        email = email.trim(),
+                        imageUri = imageUri?.toString()
+                    )
 
-                navController.popBackStack()
+                    navController.popBackStack()
+                }
             }
         }
     }
 }
 
 
-
 @Composable
-fun ImageUploadCard() {
+fun ImageUploadCard(
+    imageUri: Uri?,
+    onImageClick: () -> Unit
+) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -113,16 +143,29 @@ fun ImageUploadCard() {
             .background(
                 color = MaterialTheme.colorScheme.surfaceVariant,
                 shape = RoundedCornerShape(16.dp)
-            ),
+            )
+            .clickable { onImageClick() },
         contentAlignment = Alignment.Center
     ) {
-        Text(
-            text = "Upload Image",
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
+        if (imageUri != null) {
+            AsyncImage(
+                model = imageUri,
+                contentDescription = "Selected Image",
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(8.dp),
+                contentScale = ContentScale.Crop
+            )
+        } else {
+            Text(
+                text = "Upload Image",
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
     }
 }
+
 
 @Composable
 fun LostFoundToggle(
@@ -190,8 +233,7 @@ fun AddItemForm(
     onContactNumberChange: (String) -> Unit,
     email: String,
     onEmailChange: (String) -> Unit
-)
- {
+) {
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
 
         OutlinedTextField(
@@ -215,6 +257,7 @@ fun AddItemForm(
             modifier = Modifier.fillMaxWidth(),
             minLines = 3
         )
+
         OutlinedTextField(
             value = contactNumber,
             onValueChange = onContactNumberChange,
@@ -228,7 +271,6 @@ fun AddItemForm(
             label = { Text("Email (optional)") },
             modifier = Modifier.fillMaxWidth()
         )
-
     }
 }
 
@@ -243,13 +285,14 @@ fun PostButton(onClick: () -> Unit) {
     }
 }
 
-
-
 @Preview(showBackground = true)
 @Composable
 fun AddItemScreenPreview() {
+    val context = LocalContext.current
+    val application = context.applicationContext as Application
+
     AddItemScreen(
         navController = rememberNavController(),
-        viewModel = viewModel()
+        viewModel = AddItemViewModel(application)
     )
 }

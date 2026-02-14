@@ -1,6 +1,5 @@
 package com.example.lostify.ui.theme
 
-import android.app.Application
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -13,42 +12,30 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.example.lostify.R
-import com.example.lostify.data.HomeViewModel
 import com.example.lostify.data.ItemType
+import com.example.lostify.data.LostItemEntity
 import com.example.lostify.navigation.NavRoutes
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    navController: NavHostController
+    navController: NavHostController,
+    itemList: List<LostItemEntity>
 ) {
-    val context = LocalContext.current
-    val application = context.applicationContext as Application
-
-    val viewModel: HomeViewModel = viewModel(
-        factory = HomeViewModelFactory(application)
-    )
-
-    val items by viewModel.items.collectAsState()
 
     var query by remember { mutableStateOf("") }
     var active by remember { mutableStateOf(false) }
     var selectedType by remember { mutableStateOf<ItemType?>(null) }
 
-
-    val filteredItems = items.filter { item ->
+    val filteredItems = itemList.filter { item ->
         (selectedType == null || item.type == selectedType) &&
-                (item.title ?: "").contains(query, ignoreCase = true)
+                item.title.contains(query, ignoreCase = true)
     }
 
     Scaffold(
@@ -138,15 +125,8 @@ fun HomeScreen(
                 ) {
                     items(filteredItems) { item ->
 
-
-                        val safeItem = item.copy(
-                            imageRes = item.imageRes
-                                ?.takeIf { it != 0 }
-                                ?: R.drawable.ic_lost1
-                        )
-
                         LostItemCard(
-                            item = safeItem,
+                            item = item,
                             onClick = {
                                 navController.navigate(
                                     NavRoutes.Detail.passItemId(
@@ -161,6 +141,7 @@ fun HomeScreen(
         }
     }
 }
+
 
 @Composable
 fun FilterRow(
@@ -200,10 +181,4 @@ fun FilterButton(
                 MaterialTheme.colorScheme.onSurface
         )
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun HomeScreenPreview() {
-    HomeScreen(navController = rememberNavController())
 }
