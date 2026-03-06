@@ -19,11 +19,12 @@ import coil.compose.AsyncImage
 import androidx.compose.foundation.Image
 import androidx.compose.ui.res.painterResource
 import com.example.lostify.R
+import com.example.lostify.data.FirebaseLostItem
 import com.example.lostify.data.LostItemEntity
 
 @Composable
 fun LostItemCard(
-    item: LostItemEntity,
+    item: FirebaseLostItem,
     onClick: () -> Unit
 ) {
 

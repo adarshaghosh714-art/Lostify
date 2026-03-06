@@ -1,33 +1,36 @@
 package com.example.lostify.data
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 
-class HomeViewModel(application: Application) : AndroidViewModel(application) {
+class LostItemViewModel : ViewModel() {
 
+    private val repository = LostItemRepository()
 
-    private val repository: LostItemRepository
+    private val _items = MutableStateFlow<List<FirebaseLostItem>>(emptyList())
+    val items: StateFlow<List<FirebaseLostItem>> = _items
 
     init {
-        val dao = LostifyDatabase
-            .getDatabase(application)
-            .lostItemDao()
-
-        repository = LostItemRepository(dao)
+        observeItems()
     }
 
+    private fun observeItems() {
 
-    val items = repository.getAllItems()
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = emptyList()
-        )
+        repository.listenForItems { itemList ->
+            _items.value = itemList
+        }
+    }
 
+    fun addItem(item: FirebaseLostItem) {
+        viewModelScope.launch {
+            repository.addItem(item)
+        }
+    }
 
-    fun getItemById(itemId: Int) =
-        repository.getItemById(itemId)
+    fun getItemById(id: String): FirebaseLostItem? {
+        return _items.value.find { it.id == id }
+    }
 }

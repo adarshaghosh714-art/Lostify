@@ -293,6 +293,6 @@ fun AddItemScreenPreview() {
 
     AddItemScreen(
         navController = rememberNavController(),
-        viewModel = AddItemViewModel(application)
+        viewModel = AddItemViewModel()
     )
 }

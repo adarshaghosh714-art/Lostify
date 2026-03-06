@@ -11,7 +11,7 @@ class AddItemViewModelFactory(
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(AddItemViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return AddItemViewModel(application) as T
+            return AddItemViewModel() as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

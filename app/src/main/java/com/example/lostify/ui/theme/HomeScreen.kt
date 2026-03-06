@@ -18,15 +18,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.lostify.R
+import com.example.lostify.data.FirebaseLostItem
 import com.example.lostify.data.ItemType
-import com.example.lostify.data.LostItemEntity
+import com.example.lostify.data.LostItem
 import com.example.lostify.navigation.NavRoutes
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     navController: NavHostController,
-    itemList: List<LostItemEntity>
+    itemList: List<FirebaseLostItem>
 ) {
 
     var query by remember { mutableStateOf("") }
@@ -34,22 +35,26 @@ fun HomeScreen(
     var selectedType by remember { mutableStateOf<ItemType?>(null) }
 
     val filteredItems = itemList.filter { item ->
-        (selectedType == null || item.type == selectedType) &&
+        (selectedType == null || item.type == selectedType?.name) &&
                 item.title.contains(query, ignoreCase = true)
     }
 
     Scaffold(
         topBar = {
             Column {
+
                 TopAppBar(
                     title = {
                         Row(verticalAlignment = Alignment.CenterVertically) {
+
                             Image(
                                 painter = painterResource(id = R.drawable.ic_logo),
                                 contentDescription = "Lostify Logo",
                                 modifier = Modifier.padding(8.dp)
                             )
+
                             Spacer(modifier = Modifier.width(8.dp))
+
                             Text(
                                 text = "Lostify",
                                 style = MaterialTheme.typography.titleMedium,
@@ -88,6 +93,7 @@ fun HomeScreen(
                 ) {}
             }
         },
+
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
@@ -97,6 +103,7 @@ fun HomeScreen(
                 Icon(Icons.Default.Add, contentDescription = "Add Item")
             }
         }
+
     ) { paddingValues ->
 
         Column(
@@ -113,25 +120,27 @@ fun HomeScreen(
             Spacer(modifier = Modifier.height(12.dp))
 
             if (filteredItems.isEmpty()) {
+
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
                     Text("No items found")
                 }
+
             } else {
+
                 LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
+
                     items(filteredItems) { item ->
 
                         LostItemCard(
                             item = item,
                             onClick = {
                                 navController.navigate(
-                                    NavRoutes.Detail.passItemId(
-                                        item.id.toString()
-                                    )
+                                    NavRoutes.Detail.passItemId(item.id)
                                 )
                             }
                         )
@@ -148,15 +157,26 @@ fun FilterRow(
     selectedType: ItemType?,
     onTypeSelected: (ItemType?) -> Unit
 ) {
+
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        FilterButton("All", selectedType == null) { onTypeSelected(null) }
-        FilterButton("Lost", selectedType == ItemType.LOST) { onTypeSelected(ItemType.LOST) }
-        FilterButton("Found", selectedType == ItemType.FOUND) { onTypeSelected(ItemType.FOUND) }
+
+        FilterButton("All", selectedType == null) {
+            onTypeSelected(null)
+        }
+
+        FilterButton("Lost", selectedType == ItemType.LOST) {
+            onTypeSelected(ItemType.LOST)
+        }
+
+        FilterButton("Found", selectedType == ItemType.FOUND) {
+            onTypeSelected(ItemType.FOUND)
+        }
     }
 }
+
 
 @Composable
 fun FilterButton(
@@ -164,21 +184,25 @@ fun FilterButton(
     selected: Boolean,
     onClick: () -> Unit
 ) {
+
     Button(
         onClick = onClick,
         colors = ButtonDefaults.buttonColors(
-            containerColor = if (selected)
-                MaterialTheme.colorScheme.primary
-            else
-                MaterialTheme.colorScheme.surface
+            containerColor =
+                if (selected)
+                    MaterialTheme.colorScheme.primary
+                else
+                    MaterialTheme.colorScheme.surface
         )
     ) {
+
         Text(
             text = text,
-            color = if (selected)
-                MaterialTheme.colorScheme.onPrimary
-            else
-                MaterialTheme.colorScheme.onSurface
+            color =
+                if (selected)
+                    MaterialTheme.colorScheme.onPrimary
+                else
+                    MaterialTheme.colorScheme.onSurface
         )
     }
 }

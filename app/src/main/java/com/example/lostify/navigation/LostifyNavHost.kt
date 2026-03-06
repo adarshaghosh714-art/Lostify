@@ -1,4 +1,6 @@
+
 package com.example.lostify.navigation
+
 
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -9,8 +11,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.*
 import androidx.navigation.navArgument
-import com.example.lostify.data.HomeViewModel
+import com.example.lostify.ui.screens.ItemDetailsScreen
+
 import com.example.lostify.ui.theme.*
+import com.example.lostify.data.LostItemViewModel
+
 
 @Composable
 fun LostifyNavHost(
@@ -48,7 +53,7 @@ fun LostifyNavHost(
         // ---------------- HOME ----------------
         composable(route = NavRoutes.Home.route) {
 
-            val homeViewModel: HomeViewModel = viewModel()
+            val homeViewModel: LostItemViewModel = viewModel()
             val itemList by homeViewModel.items.collectAsState()
 
             HomeScreen(
@@ -95,3 +100,4 @@ fun LostifyNavHost(
         }
     }
 }
+

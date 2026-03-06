@@ -7,7 +7,8 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "lost_items")
 data class LostItem(
     @PrimaryKey(autoGenerate = true)
-    val id:Int,
+    val id: Int,
+    val type1: String,
     val title: String,
     val location: String,
     val type: ItemType,

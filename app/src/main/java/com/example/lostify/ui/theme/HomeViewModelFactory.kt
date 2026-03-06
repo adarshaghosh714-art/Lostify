@@ -1,19 +1,18 @@
 package com.example.lostify.ui.theme
 
-import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.example.lostify.data.HomeViewModel
+import com.example.lostify.data.LostItemViewModel
 
-class HomeViewModelFactory(
-    private val application: Application
-) : ViewModelProvider.Factory {
+class HomeViewModelFactory : ViewModelProvider.Factory {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(HomeViewModel::class.java)) {
+
+        if (modelClass.isAssignableFrom(LostItemViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return HomeViewModel(application) as T
+            return LostItemViewModel() as T
         }
+
         throw IllegalArgumentException("Unknown ViewModel class")
     }
 }

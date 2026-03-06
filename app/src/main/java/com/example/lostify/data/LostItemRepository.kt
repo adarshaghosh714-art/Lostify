@@ -1,16 +1,37 @@
 package com.example.lostify.data
 
-import kotlinx.coroutines.flow.Flow
+import com.google.firebase.firestore.FirebaseFirestore
 
-class LostItemRepository (
-    private val dao : LostItemDao
-){
-    suspend fun insertItem(item : LostItemEntity){
-        dao.insertItem(item)
+class LostItemRepository {
+
+    private val firestore = FirebaseFirestore.getInstance()
+    private val itemsCollection = firestore.collection("items")
+
+    // Add item to Firestore
+    suspend fun addItem(item: FirebaseLostItem) {
+        itemsCollection.add(item)
     }
-    fun getAllItems() = dao.getAllItems()
 
-    fun getItemById(itemId: Int): Flow<LostItemEntity?> {
-        return dao.getItemById(itemId)
+    // Listen for realtime updates
+    fun listenForItems(onItemsChanged: (List<FirebaseLostItem>) -> Unit) {
+
+        itemsCollection.addSnapshotListener { snapshot, error ->
+
+            if (error != null) {
+                error.printStackTrace()
+                return@addSnapshotListener
+            }
+
+            val items = snapshot?.documents?.mapNotNull { document ->
+
+                val item = document.toObject(FirebaseLostItem::class.java)
+
+                item?.copy(
+                    id = document.id
+                )
+            } ?: emptyList()
+
+            onItemsChanged(items)
+        }
     }
 }

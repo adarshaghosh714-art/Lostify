@@ -7,25 +7,29 @@ import androidx.room.RoomDatabase
 
 @Database(
     entities = [LostItemEntity::class],
-    version = 2,
-    exportSchema = false
+    version = 2
 )
 abstract class LostifyDatabase : RoomDatabase() {
 
     abstract fun lostItemDao(): LostItemDao
 
     companion object {
+
         @Volatile
         private var INSTANCE: LostifyDatabase? = null
 
         fun getDatabase(context: Context): LostifyDatabase {
+
             return INSTANCE ?: synchronized(this) {
+
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     LostifyDatabase::class.java,
                     "lostify_database"
-                ).fallbackToDestructiveMigration()
+                )
+                    .fallbackToDestructiveMigration()
                     .build()
+
                 INSTANCE = instance
                 instance
             }

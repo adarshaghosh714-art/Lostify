@@ -7,24 +7,20 @@ import androidx.room.PrimaryKey
 data class LostItemEntity(
 
     @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
+    var id: Int = 0,
 
-    val type: ItemType,
+    var type: String = "",
 
-    val title: String,
-    val location: String,
+    var title: String = "",
+    var location: String = "",
 
-    val description: String? = null,
+    var description: String = "",
 
+    var timestamp: Long = 0L,
+    var date: Long = 0L,
 
-    val timestamp: Long? = null,
-    val date: Long,
+    var imageUri: String = "",
 
-
-    val imageRes: Int? = null,
-
-    val imageUri: String?,
-
-    val contactNumber: String? = null,
-    val email: String? = null
+    var contactNumber: String = "",
+    var email: String = ""
 )
