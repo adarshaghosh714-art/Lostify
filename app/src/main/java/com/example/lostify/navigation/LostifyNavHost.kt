@@ -1,21 +1,18 @@
-
 package com.example.lostify.navigation
-
 
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.*
 import androidx.navigation.navArgument
 import com.example.lostify.ui.screens.ItemDetailsScreen
-
 import com.example.lostify.ui.theme.*
 import com.example.lostify.data.LostItemViewModel
-
 
 @Composable
 fun LostifyNavHost(
@@ -78,7 +75,7 @@ fun LostifyNavHost(
             )
         }
 
-        // ---------------- DETAILS ----------------
+        // ---------------- ITEM DETAILS ----------------
         composable(
             route = NavRoutes.Detail.route,
             arguments = listOf(
@@ -88,6 +85,13 @@ fun LostifyNavHost(
 
             val itemId = backStackEntry.arguments?.getString("itemId")
 
+            // 🔥 Get the SAME ViewModel used in HomeScreen
+            val parentEntry = remember(backStackEntry) {
+                navController.getBackStackEntry(NavRoutes.Home.route)
+            }
+
+            val sharedViewModel: LostItemViewModel = viewModel(parentEntry)
+
             if (itemId == null) {
                 Text("Invalid item")
                 return@composable
@@ -95,9 +99,9 @@ fun LostifyNavHost(
 
             ItemDetailsScreen(
                 navController = navController,
-                itemId = itemId
+                itemId = itemId,
+                viewModel = sharedViewModel
             )
         }
     }
 }
-

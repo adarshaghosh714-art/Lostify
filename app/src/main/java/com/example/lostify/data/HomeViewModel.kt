@@ -18,7 +18,6 @@ class LostItemViewModel : ViewModel() {
     }
 
     private fun observeItems() {
-
         repository.listenForItems { itemList ->
             _items.value = itemList
         }
@@ -31,6 +30,6 @@ class LostItemViewModel : ViewModel() {
     }
 
     fun getItemById(id: String): FirebaseLostItem? {
-        return _items.value.find { it.id == id }
+        return items.value.find { it.id == id }
     }
 }

@@ -1,6 +1,7 @@
 package com.example.lostify.data
 
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.tasks.await
 
 class LostItemRepository {
 
@@ -9,7 +10,12 @@ class LostItemRepository {
 
     // Add item to Firestore
     suspend fun addItem(item: FirebaseLostItem) {
-        itemsCollection.add(item)
+
+        val docRef = itemsCollection.document()
+
+        val newItem = item.copy(id = docRef.id)
+
+        docRef.set(newItem).await()
     }
 
     // Listen for realtime updates
@@ -26,9 +32,8 @@ class LostItemRepository {
 
                 val item = document.toObject(FirebaseLostItem::class.java)
 
-                item?.copy(
-                    id = document.id
-                )
+                item?.copy(id = document.id)
+
             } ?: emptyList()
 
             onItemsChanged(items)

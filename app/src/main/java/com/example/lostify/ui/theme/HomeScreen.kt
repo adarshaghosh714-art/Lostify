@@ -20,7 +20,6 @@ import androidx.navigation.NavHostController
 import com.example.lostify.R
 import com.example.lostify.data.FirebaseLostItem
 import com.example.lostify.data.ItemType
-import com.example.lostify.data.LostItem
 import com.example.lostify.navigation.NavRoutes
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -35,16 +34,24 @@ fun HomeScreen(
     var selectedType by remember { mutableStateOf<ItemType?>(null) }
 
     val filteredItems = itemList.filter { item ->
-        (selectedType == null || item.type == selectedType?.name) &&
-                item.title.contains(query, ignoreCase = true)
+
+        val matchesType =
+            selectedType == null || item.type == selectedType?.name
+
+        val matchesQuery =
+            (item.title ?: "").contains(query, ignoreCase = true)
+
+        matchesType && matchesQuery
     }
 
     Scaffold(
+
         topBar = {
             Column {
 
                 TopAppBar(
                     title = {
+
                         Row(verticalAlignment = Alignment.CenterVertically) {
 
                             Image(
@@ -64,6 +71,7 @@ fun HomeScreen(
                     },
                     actions = {
                         IconButton(onClick = { }) {
+
                             Icon(
                                 imageVector = Icons.Default.Person,
                                 contentDescription = "Profile"
@@ -100,7 +108,11 @@ fun HomeScreen(
                     navController.navigate(NavRoutes.AddItem.route)
                 }
             ) {
-                Icon(Icons.Default.Add, contentDescription = "Add Item")
+
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "Add Item"
+                )
             }
         }
 
@@ -125,6 +137,7 @@ fun HomeScreen(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
+
                     Text("No items found")
                 }
 
@@ -138,9 +151,10 @@ fun HomeScreen(
 
                         LostItemCard(
                             item = item,
-                            onClick = {
+                            onClick = { itemId ->
+
                                 navController.navigate(
-                                    NavRoutes.Detail.passItemId(item.id)
+                                    NavRoutes.Detail.passItemId(itemId)
                                 )
                             }
                         )
@@ -150,7 +164,6 @@ fun HomeScreen(
         }
     }
 }
-
 
 @Composable
 fun FilterRow(
@@ -176,7 +189,6 @@ fun FilterRow(
         }
     }
 }
-
 
 @Composable
 fun FilterButton(

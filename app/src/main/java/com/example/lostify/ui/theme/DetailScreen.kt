@@ -24,7 +24,7 @@ import com.example.lostify.data.LostItemViewModel
 fun ItemDetailsScreen(
     navController: NavHostController,
     itemId: String,
-    viewModel: LostItemViewModel = viewModel()
+    viewModel: LostItemViewModel
 ) {
 
     val item = viewModel.getItemById(itemId)

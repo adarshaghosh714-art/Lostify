@@ -1,5 +1,6 @@
 package com.example.lostify.ui.theme
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -12,29 +13,29 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import androidx.compose.foundation.Image
-import androidx.compose.ui.res.painterResource
 import com.example.lostify.R
 import com.example.lostify.data.FirebaseLostItem
-import com.example.lostify.data.LostItemEntity
 
 @Composable
 fun LostItemCard(
     item: FirebaseLostItem,
-    onClick: () -> Unit
+    onClick: (String) -> Unit
 ) {
 
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp)
-            .clickable { onClick() },
+            .clickable {
+                onClick(item.id)
+            },
         shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
 
         Row(
@@ -42,6 +43,7 @@ fun LostItemCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
 
+            // Image
             if (!item.imageUri.isNullOrEmpty()) {
                 AsyncImage(
                     model = item.imageUri,
@@ -86,7 +88,7 @@ fun LostItemCard(
                 Spacer(modifier = Modifier.height(2.dp))
 
                 Text(
-                    text = "🕒 ${item.date}",
+                    text = "🕒 ${item.date ?: ""}",
                     style = MaterialTheme.typography.bodySmall,
                     fontStyle = FontStyle.Italic,
                     color = MaterialTheme.colorScheme.primary
