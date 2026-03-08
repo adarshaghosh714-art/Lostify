@@ -1,4 +1,4 @@
-package com.example.lostify.ui.screens
+package com.example.lostify.ui.theme
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -9,13 +9,14 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import coil.compose.AsyncImage
 import com.example.lostify.R
 import com.example.lostify.data.LostItemViewModel
 
@@ -71,14 +72,43 @@ fun ItemDetailsScreen(
                     .padding(16.dp),
                 shape = RoundedCornerShape(20.dp)
             ) {
-                Image(
-                    painter = painterResource(id = R.drawable.ic_lost1),
-                    contentDescription = "Item Image",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(220.dp),
-                    contentScale = ContentScale.Crop
-                )
+
+                if (!item.imageUri.isNullOrEmpty()) {
+
+                    AsyncImage(
+                        model = item.imageUri,
+                        contentDescription = "Item Image",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(220.dp),
+                        contentScale = ContentScale.Crop
+                    )
+
+                } else {
+
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(220.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+
+                        // Replace this with your drawable if needed
+                        Image(
+                            painter = painterResource(id = R.drawable.ic_found),
+                            contentDescription = "Default image",
+                            modifier = Modifier
+                                .size(72.dp)
+                                .clip(RoundedCornerShape(12.dp)),
+                            contentScale = ContentScale.Crop
+                        )
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Text("No Image Found")
+                    }
+                }
             }
 
             Column(

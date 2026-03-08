@@ -55,7 +55,7 @@ fun HomeScreen(
                         Row(verticalAlignment = Alignment.CenterVertically) {
 
                             Image(
-                                painter = painterResource(id = R.drawable.ic_logo),
+                                painter = painterResource(id = R.drawable.ic_brand),
                                 contentDescription = "Lostify Logo",
                                 modifier = Modifier.padding(8.dp)
                             )

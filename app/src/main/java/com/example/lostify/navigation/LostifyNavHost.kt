@@ -10,7 +10,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.*
 import androidx.navigation.navArgument
-import com.example.lostify.ui.screens.ItemDetailsScreen
+import com.example.lostify.ui.theme.ItemDetailsScreen
 import com.example.lostify.ui.theme.*
 import com.example.lostify.data.LostItemViewModel
 

@@ -55,7 +55,7 @@ fun LostItemCard(
                 )
             } else {
                 Image(
-                    painter = painterResource(id = R.drawable.ic_lost1),
+                    painter = painterResource(id = R.drawable.ic_found),
                     contentDescription = "Default image",
                     modifier = Modifier
                         .size(72.dp)

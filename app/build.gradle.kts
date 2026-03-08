@@ -59,7 +59,7 @@ dependencies {
 
     implementation("io.coil-kt:coil-compose:2.5.0")
 
-
+    implementation("io.coil-kt:coil-compose:2.6.0")
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.graphics)
