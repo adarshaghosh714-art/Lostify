@@ -8,6 +8,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
+import com.example.lostify.data.AppContextHolder
 import com.example.lostify.data.PreferenceManager
 import com.example.lostify.navigation.LostifyNavHost
 import com.example.lostify.ui.theme.LostifyTheme
@@ -19,7 +20,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        AppContextHolder.context = applicationContext
         enableEdgeToEdge()
 
         setContent {

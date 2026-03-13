@@ -25,7 +25,9 @@ class LostItemViewModel : ViewModel() {
 
     fun addItem(item: FirebaseLostItem) {
         viewModelScope.launch {
-            repository.addItem(item)
+            repository.listenForItems { items ->
+                _items.value = items
+            }
         }
     }
 

@@ -120,16 +120,18 @@ fun AddItemScreen(
                         description = description.trim(),
                         contactNumber = contactNumber.trim(),
                         email = email.trim(),
-                        imageUri = imageUri?.toString()
+                        imageUri = imageUri,
+                        onComplete = {
+                            navController.popBackStack()
+                        }
                     )
 
-                    navController.popBackStack()
+
                 }
             }
         }
     }
 }
-
 
 @Composable
 fun ImageUploadCard(
@@ -165,7 +167,6 @@ fun ImageUploadCard(
         }
     }
 }
-
 
 @Composable
 fun LostFoundToggle(
@@ -285,14 +286,3 @@ fun PostButton(onClick: () -> Unit) {
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun AddItemScreenPreview() {
-    val context = LocalContext.current
-    val application = context.applicationContext as Application
-
-    AddItemScreen(
-        navController = rememberNavController(),
-        viewModel = AddItemViewModel()
-    )
-}

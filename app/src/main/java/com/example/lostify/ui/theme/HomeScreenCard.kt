@@ -39,26 +39,28 @@ fun LostItemCard(
     ) {
 
         Row(
-            modifier = Modifier.padding(12.dp),
+            modifier = Modifier
+                .padding(12.dp)
+                .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
 
-            // Image
-            if (!item.imageUri.isNullOrEmpty()) {
+
+            if (!item.imageUrl.isNullOrEmpty()) {
                 AsyncImage(
-                    model = item.imageUri,
-                    contentDescription = item.title ?: "Lost item",
+                    model = item.imageUrl,
+                    contentDescription = "Lost item image",
                     modifier = Modifier
-                        .size(72.dp)
+                        .size(80.dp)
                         .clip(RoundedCornerShape(12.dp)),
                     contentScale = ContentScale.Crop
                 )
             } else {
                 Image(
-                    painter = painterResource(id = R.drawable.ic_found),
+                    painter = painterResource(R.drawable.ic_found),
                     contentDescription = "Default image",
                     modifier = Modifier
-                        .size(72.dp)
+                        .size(80.dp)
                         .clip(RoundedCornerShape(12.dp)),
                     contentScale = ContentScale.Crop
                 )
@@ -97,3 +99,4 @@ fun LostItemCard(
         }
     }
 }
+

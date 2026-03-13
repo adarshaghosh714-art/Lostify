@@ -6,9 +6,9 @@ data class FirebaseLostItem(
     val title: String = "",
     val location: String = "",
     val description: String = "",
-    val timestamp: Long = 0L,
-    val date: Long = 0L,
+    val timestamp: Long = 0,
+    val date: Long = 0,
+    val imageUrl: String? = null,
     val contactNumber: String = "",
-    val email: String = "",
-    val imageUri: String? = null
+    val email: String = ""
 )

@@ -73,10 +73,10 @@ fun ItemDetailsScreen(
                 shape = RoundedCornerShape(20.dp)
             ) {
 
-                if (!item.imageUri.isNullOrEmpty()) {
+                if (!item.imageUrl.isNullOrEmpty()) {
 
                     AsyncImage(
-                        model = item.imageUri,
+                        model = item.imageUrl,
                         contentDescription = "Item Image",
                         modifier = Modifier
                             .fillMaxWidth()
@@ -94,7 +94,7 @@ fun ItemDetailsScreen(
                         verticalArrangement = Arrangement.Center
                     ) {
 
-                        // Replace this with your drawable if needed
+
                         Image(
                             painter = painterResource(id = R.drawable.ic_found),
                             contentDescription = "Default image",

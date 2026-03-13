@@ -30,7 +30,7 @@ fun LostifyNavHost(
             NavRoutes.Home.route
     ) {
 
-        // ---------------- ONBOARDING ----------------
+
         composable(route = NavRoutes.Onboarding.route) {
 
             OnBoardingScreen(
@@ -47,7 +47,7 @@ fun LostifyNavHost(
             )
         }
 
-        // ---------------- HOME ----------------
+
         composable(route = NavRoutes.Home.route) {
 
             val homeViewModel: LostItemViewModel = viewModel()
@@ -59,7 +59,7 @@ fun LostifyNavHost(
             )
         }
 
-        // ---------------- ADD ITEM ----------------
+
         composable(route = NavRoutes.AddItem.route) {
 
             val context = LocalContext.current
@@ -75,7 +75,7 @@ fun LostifyNavHost(
             )
         }
 
-        // ---------------- ITEM DETAILS ----------------
+
         composable(
             route = NavRoutes.Detail.route,
             arguments = listOf(
@@ -85,7 +85,7 @@ fun LostifyNavHost(
 
             val itemId = backStackEntry.arguments?.getString("itemId")
 
-            // 🔥 Get the SAME ViewModel used in HomeScreen
+
             val parentEntry = remember(backStackEntry) {
                 navController.getBackStackEntry(NavRoutes.Home.route)
             }
