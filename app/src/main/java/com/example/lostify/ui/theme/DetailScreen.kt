@@ -1,5 +1,7 @@
 package com.example.lostify.ui.theme
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -11,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -29,6 +32,7 @@ fun ItemDetailsScreen(
 ) {
 
     val item = viewModel.getItemById(itemId)
+    val context = LocalContext.current
 
     Scaffold(
         topBar = {
@@ -94,7 +98,6 @@ fun ItemDetailsScreen(
                         verticalArrangement = Arrangement.Center
                     ) {
 
-
                         Image(
                             painter = painterResource(id = R.drawable.ic_found),
                             contentDescription = "Default image",
@@ -156,6 +159,55 @@ fun ItemDetailsScreen(
                     text = item.description,
                     style = MaterialTheme.typography.bodyLarge
                 )
+
+
+
+                Divider()
+
+                Text(
+                    text = "Contact Uploader",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+
+
+                    Button(
+                        onClick = {
+                            val intent = Intent(
+                                Intent.ACTION_DIAL,
+                                Uri.fromParts("tel", item.contactNumber, null)
+                            )
+                            context.startActivity(intent)
+                        },
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text("Call")
+                    }
+
+
+                    OutlinedButton(
+                        onClick = {
+                            val intent = Intent(Intent.ACTION_SENDTO).apply {
+                                data = Uri.parse("smsto:${item.contactNumber}")
+                                putExtra(
+                                    "sms_body",
+                                    "Hi, I found your lost item on Lostify."
+                                )
+                            }
+                            context.startActivity(intent)
+                        },
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text("Message")
+                    }
+                }
             }
         }
     }
