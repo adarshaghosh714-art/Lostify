@@ -3,6 +3,7 @@ package com.example.lostify.ui.theme
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -12,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -35,17 +37,23 @@ fun ItemDetailsScreen(
     val context = LocalContext.current
 
     Scaffold(
+        containerColor = Color(0xFFE3F2FD),
+
         topBar = {
             TopAppBar(
-                title = { Text("Item Details") },
+                title = { Text("Item Details", color = Color.White) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Back"
+                            contentDescription = "Back",
+                            tint = Color.White
                         )
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color(0xFF1976D2)
+                )
             )
         }
     ) { padding ->
@@ -58,7 +66,7 @@ fun ItemDetailsScreen(
                     .padding(padding),
                 contentAlignment = Alignment.Center
             ) {
-                Text("Item not found")
+                Text("Item not found", color = Color.Gray)
             }
 
             return@Scaffold
@@ -68,13 +76,14 @@ fun ItemDetailsScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
+                .padding(16.dp)
         ) {
 
+
             Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                shape = RoundedCornerShape(20.dp)
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White)
             ) {
 
                 if (!item.imageUrl.isNullOrEmpty()) {
@@ -109,103 +118,119 @@ fun ItemDetailsScreen(
 
                         Spacer(modifier = Modifier.height(8.dp))
 
-                        Text("No Image Found")
+                        Text("No Image Found", color = Color.Gray)
                     }
                 }
             }
 
-            Column(
-                modifier = Modifier.padding(24.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+            Spacer(modifier = Modifier.height(16.dp))
+
+
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White)
             ) {
 
-                Text(
-                    text = item.type,
-                    style = MaterialTheme.typography.labelLarge
-                )
-
-                Text(
-                    text = item.title,
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold
-                )
-
-                Row(verticalAlignment = Alignment.CenterVertically) {
-
-                    Text("📍", fontSize = 18.sp)
-
-                    Spacer(modifier = Modifier.width(6.dp))
-
-                    Text(
-                        text = item.location,
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                }
-
-                Text(
-                    text = "🕒 ${item.date}",
-                    style = MaterialTheme.typography.bodySmall
-                )
-
-                Divider()
-
-                Text(
-                    text = "Description",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold
-                )
-
-                Text(
-                    text = item.description,
-                    style = MaterialTheme.typography.bodyLarge
-                )
-
-
-
-                Divider()
-
-                Text(
-                    text = "Contact Uploader",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(14.dp)
                 ) {
 
+                    Text(
+                        text = item.type,
+                        style = MaterialTheme.typography.labelLarge,
+                        color = Color(0xFF1976D2)
+                    )
 
-                    Button(
-                        onClick = {
-                            val intent = Intent(
-                                Intent.ACTION_DIAL,
-                                Uri.fromParts("tel", item.contactNumber, null)
-                            )
-                            context.startActivity(intent)
-                        },
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Text("Call")
+                    Text(
+                        text = item.title,
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold
+                    )
+
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+
+                        Text("📍", fontSize = 18.sp)
+
+                        Spacer(modifier = Modifier.width(6.dp))
+
+                        Text(
+                            text = item.location,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
                     }
 
+                    Text(
+                        text = "🕒 ${item.date}",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color.Gray
+                    )
 
-                    OutlinedButton(
-                        onClick = {
-                            val intent = Intent(Intent.ACTION_SENDTO).apply {
-                                data = Uri.parse("smsto:${item.contactNumber}")
-                                putExtra(
-                                    "sms_body",
-                                    "Hi, I found your lost item on Lostify."
-                                )
-                            }
-                            context.startActivity(intent)
-                        },
-                        modifier = Modifier.weight(1f)
+                    Divider()
+
+                    Text(
+                        text = "Description",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold
+                    )
+
+                    Text(
+                        text = item.description,
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+
+                    Divider()
+
+                    Text(
+                        text = "Contact Uploader",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        Text("Message")
+
+
+                        Button(
+                            onClick = {
+                                val intent = Intent(
+                                    Intent.ACTION_DIAL,
+                                    Uri.fromParts("tel", item.contactNumber, null)
+                                )
+                                context.startActivity(intent)
+                            },
+                            modifier = Modifier.weight(1f),
+                            shape = RoundedCornerShape(12.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(0xFF1976D2),
+                                contentColor = Color.White
+                            )
+                        ) {
+                            Text("Call")
+                        }
+
+
+                        OutlinedButton(
+                            onClick = {
+                                val intent = Intent(Intent.ACTION_SENDTO).apply {
+                                    data = Uri.parse("smsto:${item.contactNumber}")
+                                    putExtra(
+                                        "sms_body",
+                                        "Hi, I found your lost item on Lostify."
+                                    )
+                                }
+                                context.startActivity(intent)
+                            },
+                            modifier = Modifier.weight(1f),
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Text("Message")
+                        }
                     }
                 }
             }

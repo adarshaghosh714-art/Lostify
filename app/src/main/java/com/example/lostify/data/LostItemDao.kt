@@ -1,6 +1,7 @@
 package com.example.lostify.data
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -12,9 +13,11 @@ interface LostItemDao {
     @Query("SELECT * FROM lost_items")
     fun getAllItems(): Flow<List<LostItemEntity>>
 
-
     @Query("SELECT * FROM lost_items WHERE id = :itemId")
     fun getItemById(itemId: Int): Flow<LostItemEntity?>
+
+    @Delete
+    suspend fun deleteItem(item: LostItemEntity)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertItem(item: LostItemEntity)

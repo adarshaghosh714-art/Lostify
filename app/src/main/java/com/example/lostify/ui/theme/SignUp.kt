@@ -15,20 +15,23 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.lostify.R
+import com.example.lostify.data.ProfileViewModel
 
 @Composable
 fun SignUpScreen(
     navController: NavHostController,
     authViewModel: AuthViewModel = viewModel(),
+    profileViewModel: ProfileViewModel = viewModel(),
     onLoginClick: () -> Unit = {}
 ) {
 
+    var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
+    var phone by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
     val context = LocalContext.current
@@ -69,6 +72,17 @@ fun SignUpScreen(
 
             Spacer(modifier = Modifier.height(50.dp))
 
+            // NAME
+            OutlinedTextField(
+                value = name,
+                onValueChange = { name = it },
+                label = { Text("Enter Name") },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // EMAIL
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
@@ -82,9 +96,25 @@ fun SignUpScreen(
                     unfocusedTextColor = Color.Black
                 )
             )
-
             Spacer(modifier = Modifier.height(24.dp))
 
+            // PHONE
+            OutlinedTextField(
+                value = phone,
+                onValueChange = { phone = it },
+                label = { Text("Phone Number") },
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Phone
+                ),
+                modifier = Modifier.fillMaxWidth(),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = Color.Black,
+                    unfocusedTextColor = Color.Black
+                )
+            )
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // PASSWORD
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
@@ -99,13 +129,12 @@ fun SignUpScreen(
                     unfocusedTextColor = Color.Black
                 )
             )
-
             Spacer(modifier = Modifier.height(24.dp))
 
             Button(
                 onClick = {
 
-                    if (email.isEmpty() || password.isEmpty()) {
+                    if (name.isEmpty() || email.isEmpty() || phone.isEmpty() || password.isEmpty()) {
                         Toast.makeText(
                             context,
                             "Please fill all fields",
@@ -126,11 +155,21 @@ fun SignUpScreen(
                     authViewModel.signUp(email, password) { success, error ->
 
                         if (success) {
+
+
+                            profileViewModel.saveUserData(
+                                name = name,
+                                email = email,
+                                phone = phone
+                            )
+
                             Toast.makeText(
                                 context,
                                 "Account Created Successfully",
                                 Toast.LENGTH_SHORT
                             ).show()
+
+
 
                         } else {
                             Toast.makeText(
@@ -145,15 +184,12 @@ fun SignUpScreen(
                     .fillMaxWidth()
                     .height(50.dp)
             ) {
-
                 Text("Sign Up")
-
             }
 
             Spacer(modifier = Modifier.height(24.dp))
 
             Row {
-
                 Text("Already have an account? ")
 
                 Text(
@@ -164,8 +200,6 @@ fun SignUpScreen(
                     }
                 )
             }
-
         }
     }
 }
-

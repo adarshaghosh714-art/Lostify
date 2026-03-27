@@ -1,13 +1,10 @@
-
 package com.example.lostify
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import com.example.lostify.data.AppContextHolder
 import com.example.lostify.data.PreferenceManager
@@ -33,27 +30,40 @@ class MainActivity : ComponentActivity() {
                 val context = LocalContext.current
                 val preferenceManager = remember { PreferenceManager(context) }
 
-                // Onboarding state
                 val isFirstLaunch by preferenceManager
                     .isFirstLaunch
-                    .collectAsState(initial = true)
+                    .collectAsState(initial = null)
 
-                // Firebase login check
-                val isUserLoggedIn = FirebaseAuth
-                    .getInstance()
-                    .currentUser != null
+                val auth = FirebaseAuth.getInstance()
 
-                LostifyNavHost(
-                    isFirstLaunch = isFirstLaunch,
-                    isUserLoggedIn = isUserLoggedIn,
-                    onOnboardingFinished = {
-                        CoroutineScope(Dispatchers.IO).launch {
-                            preferenceManager.setFirstLaunchCompleted()
-                        }
+                val isUserLoggedInState = remember {
+                    mutableStateOf(auth.currentUser != null)
+                }
+
+                DisposableEffect(Unit) {
+                    val listener = FirebaseAuth.AuthStateListener {
+                        isUserLoggedInState.value = it.currentUser != null
                     }
-                )
+                    auth.addAuthStateListener(listener)
+
+                    onDispose {
+                        auth.removeAuthStateListener(listener)
+                    }
+                }
+
+                if (isFirstLaunch != null) {
+
+                    LostifyNavHost(
+                        isFirstLaunch = isFirstLaunch!!,
+                        isUserLoggedIn = isUserLoggedInState.value,
+                        onOnboardingFinished = {
+                            CoroutineScope(Dispatchers.IO).launch {
+                                preferenceManager.setFirstLaunchCompleted()
+                            }
+                        }
+                    )
+                }
             }
         }
     }
 }
-

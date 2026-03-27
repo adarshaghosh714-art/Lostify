@@ -1,17 +1,19 @@
 package com.example.lostify.ui.theme
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
@@ -20,21 +22,52 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.example.lostify.R
 import com.example.lostify.data.FirebaseLostItem
+import com.example.lostify.data.formatTimestamp
 
 @Composable
 fun LostItemCard(
     item: FirebaseLostItem,
-    onClick: (String) -> Unit
+    isOwner: Boolean,
+    onClick: (String) -> Unit,
+    onDelete: (FirebaseLostItem) -> Unit
 ) {
+
+    var showDialog by remember { mutableStateOf(false) }
+
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        onDelete(item)
+                        showDialog = false
+                    }
+                ) {
+                    Text("Delete", color = Color(0xFF1976D2))
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { showDialog = false }
+                ) {
+                    Text("Cancel", color = Color.Gray)
+                }
+            },
+            title = { Text("Delete Item") },
+            text = { Text("Are you sure you want to delete this item?") }
+        )
+    }
 
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp)
-            .clickable {
-                onClick(item.id)
-            },
+            .clickable { onClick(item.id) },
         shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color.White
+        ),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
 
@@ -44,7 +77,6 @@ fun LostItemCard(
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-
 
             if (!item.imageUrl.isNullOrEmpty()) {
                 AsyncImage(
@@ -73,7 +105,7 @@ fun LostItemCard(
             ) {
 
                 Text(
-                    text = item.title ?: "Untitled Item",
+                    text = item.title.ifEmpty { "Untitled Item" },
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold
                 )
@@ -81,22 +113,39 @@ fun LostItemCard(
                 Spacer(modifier = Modifier.height(4.dp))
 
                 Text(
-                    text = "📍 ${item.location ?: "Unknown location"}",
+                    text = "📍 ${item.location.ifEmpty { "Unknown location" }}",
                     style = MaterialTheme.typography.bodyMedium,
                     fontStyle = FontStyle.Italic,
-                    color = MaterialTheme.colorScheme.primary
+                    color = Color(0xFF1976D2)
                 )
 
                 Spacer(modifier = Modifier.height(2.dp))
 
                 Text(
-                    text = "🕒 ${item.date ?: ""}",
+                    text = formatTimestamp(item.timestamp),
                     style = MaterialTheme.typography.bodySmall,
                     fontStyle = FontStyle.Italic,
-                    color = MaterialTheme.colorScheme.primary
+                    color = Color.Gray
                 )
+            }
+
+            if (isOwner) {
+                Box(
+                    modifier = Modifier
+                        .padding(start = 8.dp)
+                        .size(40.dp)
+                        .clip(CircleShape)
+                        .background(Color(0xFF1976D2).copy(alpha = 0.1f))
+                        .clickable { showDialog = true },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = "Delete Item",
+                        tint = Color(0xFF1976D2)
+                    )
+                }
             }
         }
     }
 }
-

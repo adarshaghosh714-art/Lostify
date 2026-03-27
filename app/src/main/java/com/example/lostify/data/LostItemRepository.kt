@@ -1,6 +1,7 @@
 package com.example.lostify.data
 
 import android.net.Uri
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
@@ -18,9 +19,11 @@ class LostItemRepository {
     private val firestore = FirebaseFirestore.getInstance()
     private val itemsCollection = firestore.collection("items")
 
-    // Cloudinary config
+    private val auth = FirebaseAuth.getInstance()
+
     private val cloudName = "dsy9ukvha"
     private val uploadPreset = "Lostify"
+
 
     suspend fun addItem(
         type: String,
@@ -32,24 +35,25 @@ class LostItemRepository {
         imageUri: Uri?
     ) {
 
+        val currentUser = auth.currentUser
+            ?: throw Exception("User not logged in")
+
         val docRef = itemsCollection.document()
 
         var imageUrl: String? = null
 
-       
         if (imageUri != null) {
             try {
-                android.util.Log.d("CLOUDINARY_UPLOAD", "Uploading image...")
                 imageUrl = uploadImageToCloudinary(imageUri)
-                android.util.Log.d("CLOUDINARY_UPLOAD", "IMAGE URL RETURNED: $imageUrl")
             } catch (e: Exception) {
-                android.util.Log.e("CLOUDINARY_UPLOAD", "UPLOAD FAILED", e)
+                e.printStackTrace()
                 imageUrl = null
             }
         }
 
         val newItem = FirebaseLostItem(
             id = docRef.id,
+            userId = currentUser.uid,
             type = type,
             title = title,
             location = location,
@@ -63,6 +67,44 @@ class LostItemRepository {
 
         docRef.set(newItem).await()
     }
+
+
+    suspend fun deleteItem(item: FirebaseLostItem) {
+
+        val currentUser = auth.currentUser
+            ?: throw Exception("User not logged in")
+
+        if (currentUser.uid != item.userId) {
+            throw Exception("You are not allowed to delete this item")
+        }
+
+        itemsCollection
+            .document(item.id)
+            .delete()
+            .await()
+    }
+
+
+    fun listenForItems(onItemsChanged: (List<FirebaseLostItem>) -> Unit) {
+
+        itemsCollection.addSnapshotListener { snapshot, error ->
+
+            if (error != null) {
+                error.printStackTrace()
+                return@addSnapshotListener
+            }
+
+            val items = snapshot?.documents?.mapNotNull { document ->
+
+                val item = document.toObject(FirebaseLostItem::class.java)
+                item?.copy(id = document.id)
+
+            } ?: emptyList()
+
+            onItemsChanged(items)
+        }
+    }
+
 
     private suspend fun uploadImageToCloudinary(imageUri: Uri): String =
         withContext(Dispatchers.IO) {
@@ -99,31 +141,8 @@ class LostItemRepository {
 
             val responseString = response.body?.string() ?: ""
 
-            android.util.Log.d("CLOUDINARY", responseString)
-
             val json = JSONObject(responseString)
 
             return@withContext json.getString("secure_url")
         }
-
-    fun listenForItems(onItemsChanged: (List<FirebaseLostItem>) -> Unit) {
-
-        itemsCollection.addSnapshotListener { snapshot, error ->
-
-            if (error != null) {
-                error.printStackTrace()
-                return@addSnapshotListener
-            }
-
-            val items = snapshot?.documents?.mapNotNull { document ->
-
-                val item = document.toObject(FirebaseLostItem::class.java)
-
-                item?.copy(id = document.id)
-
-            } ?: emptyList()
-
-            onItemsChanged(items)
-        }
-    }
 }
